@@ -2,6 +2,7 @@
 namespace OCFram;
 
 use Entity\Cache;
+use Model\CacheFile;
 
 class Page extends ApplicationComponent
 {
@@ -15,13 +16,12 @@ class Page extends ApplicationComponent
             throw new \InvalidArgumentException('Le nom de la variable doit être une chaine de caractères non nulle');
         }
         $this->vars[$var] = $value;
-
     }
 
 
     public function getGeneratedPage()
     {
-        if (!file_exists($this->contentFile()))
+       if (!file_exists($this->contentFile()))
         {
             throw new \RuntimeException('La vue spécifiée n\'existe pas');
         }
@@ -30,9 +30,12 @@ class Page extends ApplicationComponent
 
         extract($this->vars);
 
+        $view = new CacheFile;
+
         ob_start();
 
         require $this->contentFile;
+
         $content = ob_get_clean();
 
         ob_start();
@@ -47,6 +50,7 @@ class Page extends ApplicationComponent
 
     public function setContentFile($contentFile)
     {
+
         if (!is_string($contentFile) || empty($contentFile))
         {
             throw new \InvalidArgumentException('La vue spécifiée est invalide');

@@ -27,4 +27,27 @@ class Config extends ApplicationComponent
 
     return null;
   }
+
+    /**
+     * Méthode permettant de modifier la valeur d'un parametre.
+     * @param $param
+     * @param $value
+     */
+  public function changeConfig($param, $value)
+  {
+      $xml = new \DOMDocument;
+      $xml->load(__DIR__.'/../../App/'.$this->app->name().'/Config/app.xml');
+
+      $elements = $xml->getElementsByTagName('define');
+
+      foreach($elements as $element)
+      {
+          if($element->getAttribute('var') == $param)
+          {
+              $element->setAttribute('value',$value);
+          }
+
+      }
+      $xml->save(__DIR__.'/../../App/'.$this->app->name().'/Config/app.xml');
+  }
 }

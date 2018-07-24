@@ -6,3 +6,4 @@ foreach ($listeNews as $news)
   <p><?= nl2br($news['contenu']) ?></p>
 <?php
 }
+?>

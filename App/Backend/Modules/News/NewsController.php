@@ -38,7 +38,9 @@ class NewsController extends BackController
 
     $manager = $this->managers->getManagerOf('News');
 
-    $this->page->addVar('listeNews', $manager->getList());
+      $nombreNews = $this->app->config()->get('nombre_news');
+
+    $this->page->addVar('listeNews', $manager->getList(0, $nombreNews, $this->app->name(), 'News'));
     $this->page->addVar('nombreNews', $manager->count());
   }
 

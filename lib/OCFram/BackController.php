@@ -1,6 +1,8 @@
 <?php
 namespace OCFram;
 
+use Model\CacheFile;
+
 abstract class BackController extends ApplicationComponent
 {
   protected $action = '';
@@ -67,6 +69,20 @@ abstract class BackController extends ApplicationComponent
 
     $this->view = $view;
 
-    $this->page->setContentFile(__DIR__.'/../../App/'.$this->app->name().'/Modules/'.$this->module.'/Views/'.$this->view.'.php');
+    $viewCache = new CacheFile;
+
+    if($viewCache->isActivated() == true && file_exists(__DIR__.'/../../tmp/cache/views/'.$this->app->name().'_'.$this->module.'_'.$this->view.'.txt'))
+    {
+        $this->page->setContentFile(__DIR__.'/../../tmp/cache/views/'.$this->app->name().'_'.$this->module.'_'.$this->view.'.txt');
+    }
+    else
+    {
+        $this->page->setContentFile(__DIR__.'/../../App/'.$this->app->name().'/Modules/'.$this->module.'/Views/'.$this->view.'.php');
+
+        if($viewCache->isActivated() == true)
+        {
+            $viewCache->createViewCache('../App/'.$this->app->name().'/Modules/'.$this->module.'/Views/'.$this->view.'.php', $this->app->name(),$this->module,$this->view);
+        }
+    }
   }
 }

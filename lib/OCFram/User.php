@@ -47,4 +47,5 @@ class User
   {
     $_SESSION['flash'] = $value;
   }
+
 }

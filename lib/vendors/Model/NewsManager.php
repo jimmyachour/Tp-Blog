@@ -6,64 +6,105 @@ use \Entity\News;
 
 abstract class NewsManager extends Manager
 {
-  /**
-   * Méthode permettant d'ajouter une news.
-   * @param $news News La news à ajouter
-   * @return void
-   */
-  abstract protected function add(News $news);
-  
-  /**
-   * Méthode permettant d'enregistrer une news.
-   * @param $news News la news à enregistrer
-   * @see self::add()
-   * @see self::modify()
-   * @return void
-   */
-  public function save(News $news)
-  {
-    if ($news->isValid())
+    /**
+     * Méthode permettant d'ajouter une news.
+     * @param $news News La news à ajouter
+     * @return void
+     */
+    abstract protected function add(News $news);
+
+    public function save(News $news)
     {
-      $news->isNew() ? $this->add($news) : $this->modify($news);
+        if ($news->isValid())
+        {
+            $news->isNew() ? $this->add($news) : $this->modify($news);
+        }
+        else
+        {
+            throw new \RuntimeException('La news doit être validée pour être enregistrée');
+        }
     }
-    else
+
+    /**
+     * Méthode renvoyant le nombre de news total.
+     * @return int
+     */
+    abstract public function count();
+
+    /**
+     * Méthode permettant de supprimer une news.
+     * @param $id int L'identifiant de la news à supprimer
+     * @return void
+     */
+    abstract public function delete($id);
+
+    /**
+     * Méthode retournant une liste de news demandée.
+     * @param $debut int La première news à sélectionner
+     * @param $limite int Le nombre de news à sélectionner
+     * @return array La liste des news. Chaque entrée est une instance de News.
+     */
+    public function getList($debut = -1, $limite = -1, $app, $module)
     {
-      throw new \RuntimeException('La news doit être validée pour être enregistrée');
+        $dataCache = new CacheFile;
+
+        $filename = '../tmp/cache/datas/'.$app.$module.'-index.txt';
+
+        if($dataCache->isActivated() == true && $dataCache->verifyPeremptionCache($filename) === true && file_exists($filename))
+        {
+            return $dataCache->getDataCache($filename);
+
+        }else {
+
+            $dataPDO = $this->getListPDO($debut = -1, $limite = -1);
+
+            if ($dataCache->isActivated() == true) {
+
+                $dataCache->createIndexCache($dataPDO, $app, $module);
+
+            }
+
+            return $dataPDO;
+        }
+
     }
-  }
+    abstract public function getListPDO($debut = -1, $limite = -1);
 
-  /**
-   * Méthode renvoyant le nombre de news total.
-   * @return int
-   */
-  abstract public function count();
+    /**
+     * Méthode retournant une news précise.
+     * @param $id int L'identifiant de la news à récupérer
+     * @return News La news demandée
+     */
+    public function getUnique($id,$module)
+    {
+        $dataCache = new CacheFile;
 
-  /**
-   * Méthode permettant de supprimer une news.
-   * @param $id int L'identifiant de la news à supprimer
-   * @return void
-   */
-  abstract public function delete($id);
+        $filename = '../tmp/cache/datas/'.$module.'-'.$id.'.txt';
 
-  /**
-   * Méthode retournant une liste de news demandée.
-   * @param $debut int La première news à sélectionner
-   * @param $limite int Le nombre de news à sélectionner
-   * @return array La liste des news. Chaque entrée est une instance de News.
-   */
-  abstract public function getList($debut = -1, $limite = -1);
-  
-  /**
-   * Méthode retournant une news précise.
-   * @param $id int L'identifiant de la news à récupérer
-   * @return News La news demandée
-   */
-  abstract public function getUnique($id);
+        if($dataCache->isActivated() == true && file_exists($filename) && $dataCache->verifyPeremptionCache($filename) === true)
+        {
+            return $dataCache->getDataCache($filename);
+        }
+        else
+        {
+            $dataPDO = $this->getUniquePDO($id);
 
-  /**
-   * Méthode permettant de modifier une news.
-   * @param $news news la news à modifier
-   * @return void
-   */
-  abstract protected function modify(News $news);
+            if($dataCache->isActivated() == true)
+            {
+                $dataCache->createDataCache($this->getUniquePDO($id), $filename);
+            }
+
+            return $dataPDO;
+        }
+
+    }
+
+    abstract public function getUniquePDO($id);
+
+    /**
+     * Méthode permettant de modifier une news.
+     * @param $news news la news à modifier
+     * @return void
+     */
+    abstract protected function modify(News $news);
 }

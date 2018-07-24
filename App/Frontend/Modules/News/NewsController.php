@@ -3,8 +3,6 @@ namespace App\Frontend\Modules\News;
 
 use Entity\Cache;
 use \OCFram\BackController;
-use OCFram\CacheCollector;
-use OCFram\CacheController;
 use \OCFram\HTTPRequest;
 use \Entity\Comment;
 use \FormBuilder\CommentFormBuilder;
@@ -13,8 +11,6 @@ use \OCFram\FormHandler;
 
 class NewsController extends BackController
 {
-    use CacheCollector;
-
     public function executeIndex(HTTPRequest $request)
     {
         $nombreNews = $this->app->config()->get('nombre_news');
@@ -26,7 +22,7 @@ class NewsController extends BackController
         // On récupère le manager des news.
         $manager = $this->managers->getManagerOf('News');
 
-        $listeNews = $manager->getList(0, $nombreNews);
+        $listeNews = $manager->getList(0, $nombreNews, $this->app->name(), 'News');
 
         foreach ($listeNews as $news)
         {
@@ -48,14 +44,7 @@ class NewsController extends BackController
      */
     public function executeShow(HTTPRequest $request)
     {
-        $varCache = $this->startingCache($this->app->name(), $this->module, $request->getData('id'), $this->action);
-
-        $cache = new Cache($varCache);
-        $cacheController = new CacheController;
-
-        if ($cache->dataFileExist() ==  false || $cache->viewFileExist() == false)
-        {
-            $news = $this->managers->getManagerOf('News', $this->app->name(), $request->getData('id'), $this->action)->getUnique($request->getData('id'));
+            $news = $this->managers->getManagerOf('News')->getUnique($request->getData('id'),'News');
 
             if (empty($news))
             {
@@ -65,17 +54,6 @@ class NewsController extends BackController
             $this->page->addVar('title', $news->titre());
             $this->page->addVar('news', $news);
             $this->page->addVar('comments', $this->managers->getManagerOf('Comments')->getListOf($news->id()));
-
-            $cache->setView($this->page->contentFile());
-            $cache->setData($this->page->vars());
-            $cacheController->executeSaveCache($cache);
-        }
-        $dataCache = $cacheController->executeGetDataCache($cache);
-
-        foreach ($dataCache as $key => $value)
-        {
-            $this->page->addVar($key, $value);
-        }
 
     }
 

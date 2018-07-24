@@ -27,7 +27,7 @@ class NewsManagerPDO extends NewsManager
     $this->dao->exec('DELETE FROM news WHERE id = '.(int) $id);
   }
 
-  public function getList($debut = -1, $limite = -1)
+  public function getListPDO($debut = -1, $limite = -1)
   {
     $sql = 'SELECT id, auteur, titre, contenu, dateAjout, dateModif FROM news ORDER BY id DESC';
     
@@ -52,8 +52,9 @@ class NewsManagerPDO extends NewsManager
     return $listeNews;
   }
   
-  public function getUnique($id)
+  public function getUniquePDO($id)
   {
+
     $requete = $this->dao->prepare('SELECT id, auteur, titre, contenu, dateAjout, dateModif FROM news WHERE id = :id');
     $requete->bindValue(':id', (int) $id, \PDO::PARAM_INT);
     $requete->execute();
@@ -64,11 +65,12 @@ class NewsManagerPDO extends NewsManager
     {
       $news->setDateAjout(new \DateTime($news->dateAjout()));
       $news->setDateModif(new \DateTime($news->dateModif()));
-      
+
       return $news;
     }
     
     return null;
+
   }
 
   protected function modify(News $news)
