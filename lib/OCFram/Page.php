@@ -30,7 +30,7 @@ class Page extends ApplicationComponent
 
         extract($this->vars);
 
-        $view = new CacheFile;
+        $view = new CacheFile; // variable non utilisée
 
         ob_start();
 
@@ -58,6 +58,7 @@ class Page extends ApplicationComponent
         $this->contentFile = $contentFile;
     }
 
+    // a quoi sert cette méthode ???, accesseur Get ??
     public function vars()
     {
         return $this->vars;

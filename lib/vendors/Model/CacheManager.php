@@ -4,7 +4,7 @@ namespace Model;
 
 use\Entity\Cache;
 use OCFram\Page;
-
+// A Supprimer si plus utilisé
 class CacheManager
 {
 

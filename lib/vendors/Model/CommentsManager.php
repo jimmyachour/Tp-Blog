@@ -3,7 +3,7 @@ namespace Model;
 
 use \OCFram\Manager;
 use \Entity\Comment;
-
+// Pas de Cache pour les commentaires ???
 abstract class CommentsManager extends Manager
 {
   /**
