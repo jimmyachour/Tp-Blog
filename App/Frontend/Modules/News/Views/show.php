@@ -16,8 +16,9 @@ if (empty($comments))
 <?php
 }
 
-foreach ($comments as $comment)
-{
+if(isset($comments) && !empty($comments)){
+    foreach ($comments as $comment)
+    {
 ?>
 <fieldset>
   <legend>
@@ -30,6 +31,7 @@ foreach ($comments as $comment)
   <p><?= nl2br(htmlspecialchars($comment['contenu'])) ?></p>
 </fieldset>
 <?php
+}
 }
 ?>
 

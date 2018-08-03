@@ -1,4 +1,5 @@
 <?php
+
 namespace Model;
 
 use \OCFram\Manager;
@@ -15,12 +16,9 @@ abstract class NewsManager extends Manager
 
     public function save(News $news)
     {
-        if ($news->isValid())
-        {
+        if ($news->isValid()) {
             $news->isNew() ? $this->add($news) : $this->modify($news);
-        }
-        else
-        {
+        } else {
             throw new \RuntimeException('La news doit être validée pour être enregistrée');
         }
     }
@@ -42,64 +40,51 @@ abstract class NewsManager extends Manager
      * Méthode retournant une liste de news demandée.
      * @param $debut int La première news à sélectionner
      * @param $limite int Le nombre de news à sélectionner
+     * @param $type string le type de donnée à mettre en cache
+     * @param $dir_cache chemin d'accès où enregistrer les données
      * @return array La liste des news. Chaque entrée est une instance de News.
      */
-    // revenir sur le prototype std getList($debut = -1, $limite = -1)
-    // pas compris l'ajout de app et module ...
-    // ton cache doit être calculé en fonction de debut et limite
-    // tu peux par exemple faire md5($debut.':'.$limite) pour avoir un id de cache
-    public function getList($debut = -1, $limite = -1, $app, $module)
+    public function getList($debut = -1, $limite = -1,$type = null ,$dir_cache = null)
     {
         $dataCache = new CacheFile;
 
-        // ne doit pas être connu du manager
-        $filename = '../tmp/cache/datas/'.$app.$module.'-index.txt';
+        if ($dataCache->isActivated() == true && file_exists($dir_cache) && $dataCache->checkCacheValidy($dir_cache) == true) {
+            return $dataCache->getCache($dir_cache);
 
-        // pas mal comme implementation, ah voir si en une lecture fichier tu peux checker le timestamp et renvoyer les données
-        // optimization un seul I/O pour le même fichier
-        if($dataCache->isActivated() == true && $dataCache->verifyPeremptionCache($filename) === true && file_exists($filename))
-        {
-            return $dataCache->getDataCache($filename);
-
-        }else {
+        } else {
 
             $dataPDO = $this->getListPDO($debut = -1, $limite = -1);
 
-            if ($dataCache->isActivated() == true) {
+            if ($dataCache->isActivated() == true && $type != null && $dir_cache != null) {
 
-                $dataCache->createIndexCache($dataPDO, $app, $module);
-
+                $dataCache->createCache($dataPDO, $type, $dir_cache);
             }
 
             return $dataPDO;
         }
 
     }
+
     abstract public function getListPDO($debut = -1, $limite = -1);
 
     /**
      * Méthode retournant une news précise.
      * @param $id int L'identifiant de la news à récupérer
+     * @param $type string le type de donnée à mettre en cache
+     * @param $dir_cache chemin d'accès où enregistrer les données
      * @return News La news demandée
      */
-    public function getUnique($id,$module)
+    public function getUnique($id, $type = null, $dir_cache = null)
     {
         $dataCache = new CacheFile;
-        // le fichier de cache n'a pas a être connu du Manager,
-        // lui doit donner juste l'id de cache de la ressource qu'il souhaite traiter
-        $filename = '../tmp/cache/datas/'.$module.'-'.$id.'.txt';
 
-        if($dataCache->isActivated() == true && file_exists($filename) && $dataCache->verifyPeremptionCache($filename) === true)
-        {
-            return $dataCache->getDataCache($filename);
-        }
-        else
-        {
-            $dataPDO = $this->getUniquePDO($id); // methode appelé deux fois ...
+        if ($dataCache->isActivated() == true && file_exists($dir_cache) && $dataCache->checkCacheValidy($dir_cache) === true) {
+            return $dataCache->getCache($dir_cache);
+        } else {
+            $dataPDO = $this->getUniquePDO($id);
 
-            if($dataCache->isActivated() == true)
-            {
-                $dataCache->createDataCache($this->getUniquePDO($id), $filename);
+            if ($dataCache->isActivated() == true && $type != null && $dir_cache != null) {
+                $dataCache->createCache($this->getUniquePDO($id), $type,  $dir_cache);
             }
 
             return $dataPDO;

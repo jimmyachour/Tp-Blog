@@ -26,19 +26,22 @@ class CacheController extends BackController
 
     public function saveConfig($cacheConfig)
     {
-        foreach ($cacheConfig as $element => $value)
+        foreach ($cacheConfig as $name => $value)
         {
-            $this->app->config()->changeConfig($element, $value);
+            $this->app->config()->set($name, $value);
         }
 
         $this->app->httpResponse()->redirect('cache-config.html');
+
     }
 
     public function executeDeleteCache()
     {
         $cacheFile = new CacheFile();
-        $cacheFile->deleteCache();
+        $cacheFile->deleteAllCache();
 
         $this->app->httpResponse()->redirect('cache-config.html');
     }
+
+
 }

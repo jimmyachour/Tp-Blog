@@ -1,4 +1,5 @@
 <?php
+
 namespace OCFram;
 
 use Entity\Cache;
@@ -11,8 +12,7 @@ class Page extends ApplicationComponent
 
     public function addVar($var, $value)
     {
-        if (!is_string($var) || is_numeric($var) || empty($var))
-        {
+        if (!is_string($var) || is_numeric($var) || empty($var)) {
             throw new \InvalidArgumentException('Le nom de la variable doit être une chaine de caractères non nulle');
         }
         $this->vars[$var] = $value;
@@ -21,16 +21,13 @@ class Page extends ApplicationComponent
 
     public function getGeneratedPage()
     {
-       if (!file_exists($this->contentFile()))
-        {
+        if (!file_exists($this->contentFile())) {
             throw new \RuntimeException('La vue spécifiée n\'existe pas');
         }
 
         $user = $this->app->user();
 
         extract($this->vars);
-
-        $view = new CacheFile; // variable non utilisée
 
         ob_start();
 
@@ -39,30 +36,27 @@ class Page extends ApplicationComponent
         $content = ob_get_clean();
 
         ob_start();
-        require __DIR__.'/../../App/'.$this->app->name().'/Templates/layout.php';
+        require __DIR__ . '/../../App/' . $this->app->name() . '/Templates/layout.php';
         return ob_get_clean();
     }
 
     public function contentFile()
     {
+
         return $this->contentFile;
     }
 
     public function setContentFile($contentFile)
     {
 
-        if (!is_string($contentFile) || empty($contentFile))
-        {
+        if (!is_string($contentFile) || empty($contentFile)) {
             throw new \InvalidArgumentException('La vue spécifiée est invalide');
         }
         $this->contentFile = $contentFile;
     }
 
-    // a quoi sert cette méthode ???, accesseur Get ??
     public function vars()
     {
         return $this->vars;
     }
-
-
 }

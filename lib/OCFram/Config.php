@@ -4,13 +4,20 @@ namespace OCFram;
 class Config extends ApplicationComponent
 {
   protected $vars = [];
+  protected $confDir;
+
+    public function ConfDir()
+    {
+      return $this->confDir = __DIR__.'/../../App/'.$this->app->name().'/Config/app.xml';
+    }
 
   public function get($var)
   {
+
     if (!$this->vars)
     {
       $xml = new \DOMDocument;
-      $xml->load(__DIR__.'/../../App/'.$this->app->name().'/Config/app.xml');
+      $xml->load($this->confDir());
 
       $elements = $xml->getElementsByTagName('define');
 
@@ -30,30 +37,27 @@ class Config extends ApplicationComponent
 
     /**
      * Méthode permettant de modifier la valeur d'un parametre.
-     * @param $param
+     * @param $name
      * @param $value
      */
-// revoir le nom set($name, $value) par exemple plus parlant
-  public function changeConfig($param, $value)
+  public function set($name, $value)
   {
-      // A refacto avec la methode get, comportementcomme singleton
-      // si déja chargé on utilise le tableau
-      // avoir une variable pour ne pas répéter le nom de fichier (si on change
-      // le fichier on doit el changer à un seul endroit
       $xml = new \DOMDocument;
-      $xml->load(__DIR__.'/../../App/'.$this->app->name().'/Config/app.xml');
+
+      $xml->load($this->confDir());
 
       $elements = $xml->getElementsByTagName('define');
 
-      // surement une méthode plus rapide que de parcourir tous les éléments ;-)
       foreach($elements as $element)
       {
-          if($element->getAttribute('var') == $param)
+          if($element->getAttribute('var') == $name)
           {
               $element->setAttribute('value',$value);
           }
-
       }
-      $xml->save(__DIR__.'/../../App/'.$this->app->name().'/Config/app.xml');
+
+      $xml->save($this->confDir);
+
   }
+
 }

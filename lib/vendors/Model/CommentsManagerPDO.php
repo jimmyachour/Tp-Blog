@@ -28,7 +28,7 @@ class CommentsManagerPDO extends CommentsManager
     $this->dao->exec('DELETE FROM comments WHERE news = '.(int) $news);
   }
   
-  public function getListOf($news)
+  public function getListOfPDO($news)
   {
     if (!ctype_digit($news))
     {

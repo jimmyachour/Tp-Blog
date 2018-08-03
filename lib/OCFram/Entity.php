@@ -6,7 +6,7 @@ abstract class Entity implements \ArrayAccess
   use Hydrator;
 
   protected $erreurs = [];
-  protected $id; // changement inutile par rapport au commit précedent
+  protected $id;
 
   public function __construct(array $donnees = [])
   {
