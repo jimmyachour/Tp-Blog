@@ -9,6 +9,7 @@ class Page extends ApplicationComponent
 {
     protected $contentFile;
     protected $vars = [];
+    protected $contentCache;
 
     public function addVar($var, $value)
     {
@@ -21,7 +22,7 @@ class Page extends ApplicationComponent
 
     public function getGeneratedPage()
     {
-        if (!file_exists($this->contentFile())) {
+        if (!file_exists($this->contentFile()) && $this->contentCache == null) {
             throw new \RuntimeException('La vue spécifiée n\'existe pas');
         }
 
@@ -31,7 +32,15 @@ class Page extends ApplicationComponent
 
         ob_start();
 
-        require $this->contentFile;
+        if($this->contentCache != null)
+        {
+            echo $this->contentCache;
+        }
+        else
+        {
+            require $this->contentFile;
+
+        }
 
         $content = ob_get_clean();
 
@@ -58,5 +67,10 @@ class Page extends ApplicationComponent
     public function vars()
     {
         return $this->vars;
+    }
+
+    public function setContentCache($cacheView)
+    {
+        $this->contentCache = $cacheView;
     }
 }

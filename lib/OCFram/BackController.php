@@ -73,7 +73,7 @@ abstract class BackController extends ApplicationComponent
 
         if ($viewCache->isActivated() == true && $viewCache->checkCacheValidy($dir_viewCache) && file_exists($dir_viewCache))
         {
-            $this->page->setContentFile($dir_viewCache);
+            $this->page->setContentCache($viewCache->getCache($dir_viewCache));
         }
         else
         {
