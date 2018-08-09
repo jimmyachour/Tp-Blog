@@ -3,7 +3,6 @@
 namespace OCFram;
 
 use Entity\Cache;
-use Model\CacheFile;
 
 class Page extends ApplicationComponent
 {

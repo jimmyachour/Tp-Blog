@@ -69,20 +69,7 @@ abstract class BackController extends ApplicationComponent
 
         $this->view = $view;
 
-        $viewCache = new CacheFile;
+        $this->page->setContentFile($dir_view);
 
-        if ($viewCache->isActivated() == true && $viewCache->checkCacheValidy($dir_viewCache) && file_exists($dir_viewCache))
-        {
-            $this->page->setContentCache($viewCache->getCache($dir_viewCache));
-        }
-        else
-        {
-            $this->page->setContentFile($dir_view);
-
-            if ($viewCache->isActivated() == true)
-            {
-                $viewCache->createCache($dir_view,'views',$dir_viewCache);
-            }
-        }
     }
 }

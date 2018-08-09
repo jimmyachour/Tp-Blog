@@ -2,21 +2,33 @@
 
 namespace Model;
 
+/**
+ * Class CacheFile
+ * @package Model
+ *
+ * Amelioration possible : configurer le type de serializer le serialiser php ou json (de plus en plus utilisé et cross language)
+ */
 class CacheFile
 {
+
+
     private $_timeUp = array(
         'views' => 3600 * 24 * 3,
-        'datas' => 3600 * 24 * 10,
-        'comments' => 3600 * 24 * 10,
+        'data' => 3600 * 24 * 10, // for all models
         'index' => 3600 * 24 * 10
     );
 
     private $_folders = array(
-        'datas' => '../tmp/cache/datas',
-        'views' => '../tmp/cache/views',
-        'comments' => '../tmp/cache/comments'
+        'data' => '../tmp/cache/data',
+        'views' => '../tmp/cache/views'
     );
 
+    const ENTITY_NEWS = 'news';
+    const ENTITY_COMMENT = 'comment';
+    const LIST_CACHE = 'list';
+
+
+    private $_data = null;
     private $dir_cacheConfig = '../App/Backend/Config/app.xml';
 
     /**
@@ -25,6 +37,8 @@ class CacheFile
      */
     public function isActivated()
     {
+
+
         $xml = new \DOMDocument;
         $xml->load($this->dir_cacheConfig);
 
@@ -38,20 +52,43 @@ class CacheFile
         return false;
     }
 
+
+    /**
+     * Méthode permettant de récupérer les datas mises en cache.
+     * @param $filename
+     * @return mixed
+     */
+    public function getCache($key)
+    {
+        $filename = $this->_getFilename($key);
+        $this->_loadData($filename);
+        return ((isset($this->_data[1])) ? $this->_data[1] : null);
+    }
+
     /**
      * Méthode permettant de savoir si le fichier $filename est toujours valide.
      * @param $filename
      * @return bool
      */
-    public function checkCacheValidy($filename)
+    public function checkCacheValidy($key)
     {
+        $filename = $this->_getFilename($key);
+
         if (date(time()) <= $this->getTimeStamp($filename)) {
             return true;
         } else {
             $this->deleteCache($filename);
             return false;
         }
+    }
 
+    private function _loadData($filename)
+    {
+        if (!$this->_data) {
+            if (file_exists($filename)) {
+                $this->_data = unserialize(file_get_contents($filename));
+            }
+        }
     }
 
     /**
@@ -61,14 +98,9 @@ class CacheFile
      */
     public function getTimeStamp($filename)
     {
-        if (file_exists($filename)) {
+        $this->_loadData($filename);
+        return ((isset($this->_data[0])) ? $this->_data[0] : false);
 
-            $data_cache = file_get_contents($filename, "r");
-
-            $timestamp_unserialized = unserialize($data_cache);
-
-            return $timestamp_unserialized[0];
-        }
     }
 
     /**
@@ -89,6 +121,7 @@ class CacheFile
     {
         $folders = $this->_folders;
 
+        //@FIXME review this, directory is hardcoded and the double foreach
         foreach ($folders as $folder => $dir) {
             $dir_iterator = new \RecursiveDirectoryIterator($dir);
             $iterator = new \RecursiveIteratorIterator($dir_iterator);
@@ -105,41 +138,45 @@ class CacheFile
      * Méthode permettant de mettre en cache les datas $dataPDO à l'emplacement $filename.
      * @param $content
      * @param $type
-     * @param $fileName
+     * @param $key
      */
-    public function createCache($content, $type , $fileName)
+    public function createCache($content, $type, $key)
     {
-        if($type === 'views')
-        {
-            $cacheFile = array(date(time()) + $this->_timeUp[$type], file_get_contents($content));
-        }
-        else
-        {
-            $cacheFile = array(date(time()) + $this->_timeUp[$type], $content);
+        if ($type === "views") {
+            $data = array(date(time()) + $this->_timeUp[$type], file_get_contents($content));
+            $filename = $key; //Not change View cache for moment
+        } else {
+            $data = array(date(time()) + $this->_timeUp[$type], $content);
+            $filename = $this->_getFilename($key);
         }
 
-        $cacheFile_serialize = serialize($cacheFile);
-
-        $file = fopen($fileName, 'a+');
-
-        if (fwrite($file, $cacheFile_serialize) === false) {
-            exit;
+        if (file_put_contents($filename, serialize($data)) === false) {
+            exit; //FIXME add logs into application to save errors
         }
-        fclose($file);
     }
 
     /**
-     * Méthode permettant de récupérer les datas mises en cache.
-     * @param $filename
-     * @return mixed
+     * Get filename by Cache Key
+     * @param $key
+     * @return string
      */
-    public function getCache($filename)
+    private function _getFilename($key)
     {
-        $data_cache = file_get_contents($filename, "r");
+        $keyParts = explode("-", $key);
 
-        $data_unserialized = unserialize($data_cache);
+        switch ($keyParts[0]) {
 
-            return $data_unserialized[1];
+            case self::ENTITY_NEWS :
+            case self::ENTITY_COMMENT :
+            case self::LIST_CACHE :
+                return $this->_folders["data"] . "/" . $key . ".txt";
+                break;
+
+            default:
+                return $key;
+                break;
+        }
     }
+
 
 }

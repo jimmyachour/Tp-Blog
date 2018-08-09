@@ -47,21 +47,26 @@ abstract class CommentsManager extends Manager
      * @param $news La news sur laquelle on veut récupérer les commentaires
      * @return array
      */
-    public function getListOf($news,$type , $filename)
+    public function getListOf($news, $cache = 0)
     {
         $commentsCache = new CacheFile;
+        $cacheKey = sprintf("list-comment-%d", $news);
+        $commentsListPDO = null;
 
-        if ($commentsCache->isActivated() == true && file_exists($filename) && $commentsCache->checkCacheValidy($filename) === true) {
-            return $commentsCache->getCache($filename);
-        } else {
+        if ($cache && $commentsCache->isActivated() == true && $commentsCache->checkCacheValidy($cacheKey) === true) {
+            $commentsListPDO = $commentsCache->getCache($cacheKey);
+        }
+
+        if (!$commentsListPDO) {
             $commentsListPDO = $this->getListOfPDO($news);
 
-            if ($commentsCache->isActivated() == true && !empty($commentsListPDO[0])) {
-                $commentsCache->createCache($commentsListPDO, $type, $filename);
+            if ($commentsCache->isActivated() == true && count($commentsListPDO) > 0) {
+                $commentsCache->createCache($commentsListPDO, 'data', $cacheKey);
             }
 
-            return $commentsListPDO;
         }
+
+        return $commentsListPDO;
     }
 
     abstract public function getListOfPDO($news);

@@ -2,10 +2,7 @@
 
 namespace App\Frontend\Modules\News;
 
-use Entity\Cache;
-use OCFram\Application;
 use \OCFram\BackController;
-use OCFram\Config;
 use \OCFram\HTTPRequest;
 use \Entity\Comment;
 use \FormBuilder\CommentFormBuilder;
@@ -19,7 +16,6 @@ class NewsController extends BackController
         $nombreNews = $this->app->config()->get('nombre_news');
         $nombreCaracteres = $this->app->config()->get('nombre_caracteres');
 
-        $dir_indexCache = '../tmp/cache/datas/'.$this->app->name().$this->module.'-index.txt';
 
         // On ajoute une définition pour le titre.
         $this->page->addVar('title', 'Liste des ' . $nombreNews . ' dernières news');
@@ -27,7 +23,7 @@ class NewsController extends BackController
         // On récupère le manager des news.
         $manager = $this->managers->getManagerOf('News');
 
-        $listeNews = $manager->getList(0, $nombreNews, 'index', $dir_indexCache);
+        $listeNews = $manager->getList(0, $nombreNews, 1);
 
         foreach ($listeNews as $news) {
             if (strlen($news->contenu()) > $nombreCaracteres) {
@@ -48,11 +44,7 @@ class NewsController extends BackController
      */
     public function executeShow(HTTPRequest $request)
     {
-        $dir_newsCache = '../tmp/cache/datas/' . $this->module . '-' . $request->getData('id') . '.txt';
-        $dir_commentsCache = '../tmp/cache/comments/comment_' . $this->module . '-' . $request->getData('id') . '.txt';
-
-        $news = $this->managers->getManagerOf('News')->getUnique($request->getData('id'),'datas', $dir_newsCache);
-
+        $news = $this->managers->getManagerOf('News')->getUnique($request->getData('id'), 1);
 
         if (empty($news)) {
             $this->app->httpResponse()->redirect404();
@@ -60,7 +52,7 @@ class NewsController extends BackController
 
         $this->page->addVar('title', $news->titre());
         $this->page->addVar('news', $news);
-        $this->page->addVar('comments', $this->managers->getManagerOf('Comments')->getListOf($news->id(),'comments', $dir_commentsCache));
+        $this->page->addVar('comments', $this->managers->getManagerOf('Comments')->getListOf($news->id(), 1));
 
     }
 

@@ -44,24 +44,29 @@ abstract class NewsManager extends Manager
      * @param $dir_cache chemin d'accès où enregistrer les données
      * @return array La liste des news. Chaque entrée est une instance de News.
      */
-    public function getList($debut = -1, $limite = -1,$type = null ,$dir_cache = null)
+    public function getList($debut = -1, $limite = -1, $cache = 0)
     {
         $dataCache = new CacheFile;
+        $cacheKey = sprintf("list-news-%d-%d", $debut, $limite);
+        $dataPDO = null;
 
-        if ($dataCache->isActivated() == true && file_exists($dir_cache) && $dataCache->checkCacheValidy($dir_cache) == true) {
-            return $dataCache->getCache($dir_cache);
+        if ($cache && $dataCache->isActivated() == true && $dataCache->checkCacheValidy($cacheKey) == true) {
+            $dataPDO = $dataCache->getCache($cacheKey);
+        }
 
-        } else {
+        if (!$dataPDO) {
 
-            $dataPDO = $this->getListPDO($debut = -1, $limite = -1);
+            $dataPDO = $this->getListPDO($debut, $limite);
 
-            if ($dataCache->isActivated() == true && $type != null && $dir_cache != null) {
+            if ($dataCache->isActivated() == true) {
 
-                $dataCache->createCache($dataPDO, $type, $dir_cache);
+                $dataCache->createCache($dataPDO, "data", $cacheKey);
             }
 
-            return $dataPDO;
+
         }
+
+        return $dataPDO;
 
     }
 
@@ -70,25 +75,29 @@ abstract class NewsManager extends Manager
     /**
      * Méthode retournant une news précise.
      * @param $id int L'identifiant de la news à récupérer
-     * @param $type string le type de donnée à mettre en cache
-     * @param $dir_cache chemin d'accès où enregistrer les données
      * @return News La news demandée
      */
-    public function getUnique($id, $type = null, $dir_cache = null)
+    public function getUnique($id, $cache = 0)
     {
         $dataCache = new CacheFile;
+        $cacheKey = "news-" . $id;
+        $dataPDO = null;
 
-        if ($dataCache->isActivated() == true && file_exists($dir_cache) && $dataCache->checkCacheValidy($dir_cache) === true) {
-            return $dataCache->getCache($dir_cache);
-        } else {
+        if ($cache && $dataCache->isActivated() == true && $dataCache->checkCacheValidy($cacheKey) === true) {
+            $dataPDO = $dataCache->getCache($cacheKey);
+        }
+
+        if (!$dataPDO) {
+
             $dataPDO = $this->getUniquePDO($id);
-
-            if ($dataCache->isActivated() == true && $type != null && $dir_cache != null) {
-                $dataCache->createCache($this->getUniquePDO($id), $type,  $dir_cache);
+            if ($dataCache->isActivated() == true) {
+                $dataCache->createCache($dataPDO, 'data', $cacheKey);
             }
 
-            return $dataPDO;
+
         }
+
+        return $dataPDO;
 
     }
 

@@ -35,7 +35,6 @@ class NewsController extends BackController
 
     public function executeIndex(HTTPRequest $request)
     {
-        $dir_cache = '../tmp/cache/datas/'.$this->app->name().$this->module.'-index.txt';
 
         $this->page->addVar('title', 'Gestion des news');
 
@@ -43,7 +42,7 @@ class NewsController extends BackController
 
         $nombreNews = $this->app->config()->get('nombre_news');
 
-        $this->page->addVar('listeNews', $manager->getList(0, $nombreNews,'index', $dir_cache));
+        $this->page->addVar('listeNews', $manager->getList());
         $this->page->addVar('nombreNews', $manager->count());
     }
 
