@@ -46,15 +46,13 @@ class Config extends ApplicationComponent
 
       $xml->load($this->confDir());
 
-      $elements = $xml->getElementsByTagName('define');
+      $xpath = new \DOMXPath($xml);
 
-      //@FIXME use Xpath Query to set Config @see http://php.net/manual/fr/class.domxpath.php
-      foreach($elements as $element)
+      $query = "//definitions/define[@var=\"$name\"]";
+
+      if($xpath->query($query) == true)
       {
-          if($element->getAttribute('var') == $name)
-          {
-              $element->setAttribute('value',$value);
-          }
+          $xpath->query($query)->item(0)->setAttribute('value',$value);
       }
 
       $xml->save($this->confDir);

@@ -1,8 +1,18 @@
+<?php
+$title = isset($title) ? $title : 'Mon super site';
+
+$onglet = (!$user->isAuthenticated()) ? '<li><a href="/admin/">Se Connecter</a></li>' : '<li><a href="/admin/">Admin</a></li>';
+
+$flash = ($user->hasFlash()) ? '<p style="text-align: center;">'.$user->getFlash().'</p>' : null;
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>
-        <?= isset($title) ? $title : 'Mon super site' ?>
+        <?= $title ?>
     </title>
 
     <meta charset="utf-8" />
@@ -20,20 +30,15 @@
     <nav>
         <ul>
             <li><a href="/">Accueil</a></li>
-            <?php if(!$user->isAuthenticated()){ ?>
-                <li><a href="/admin/">Se Connecter</a></li>
-            <?php } ?>
-            <?php if ($user->isAuthenticated()) { ?>
-                <li><a href="/admin/">Admin</a></li>
-            <?php } ?>
+            <?= $onglet ?>
         </ul>
     </nav>
 
     <div id="content-wrap">
         <section id="main">
-            <?php if ($user->hasFlash()) echo '<p style="text-align: center;">'.$user->getFlash().'</p>'; ?>
+            <?= $flash ?>
 
-            <?php echo $content;?>
+            <?= $content ?>
 
         </section>
     </div>

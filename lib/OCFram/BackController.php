@@ -60,16 +60,32 @@ abstract class BackController extends ApplicationComponent
 
     public function setView($view)
     {
-        $dir_viewCache = __DIR__ . '/../../tmp/cache/views/' . $this->app->name() . '_' . $this->module . '_' . $this->action . '.txt';
+        $cacheKey = 'view-'.$this->app->name() . '-' . $this->module . '-' . $this->action;
         $dir_view = __DIR__ . '/../../App/' . $this->app->name() . '/Modules/' . $this->module . '/Views/' . $this->action . '.php';
 
         if (!is_string($view) || empty($view)) {
             throw new \InvalidArgumentException('La vue doit être une chaine de caractères valide');
         }
 
-        $this->view = $view;
-
         $this->page->setContentFile($dir_view);
 
+        //View disabled for the moment
+/*
+        $viewCache = new CacheFile;
+
+        if ($viewCache->isActivated() && $viewCache->checkCacheValidy('views', $cacheKey) == true )
+        {
+            $this->page->setContentCache($viewCache->getCache('views', $cacheKey));
+        }
+        else
+        {
+            $this->page->setContentFile($dir_view);
+
+            if ($viewCache->isActivated() == true)
+            {
+                $viewCache->createCache($dir_view,'views',$cacheKey);
+            }
+        }
+*/
     }
 }

@@ -1,0 +1,9 @@
+a:2:{i:0;i:1534424225;i:1;s:167:"<?php
+foreach ($listeNews as $news)
+{
+?>
+  <h2><a href="news-<?= $news['id'] ?>.html"><?= $news['titre'] ?></a></h2>
+  <p><?= nl2br($news['contenu']) ?></p>
+<?php
+}
+?>";}

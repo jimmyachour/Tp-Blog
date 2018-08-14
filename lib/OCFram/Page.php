@@ -2,8 +2,6 @@
 
 namespace OCFram;
 
-use Entity\Cache;
-
 class Page extends ApplicationComponent
 {
     protected $contentFile;
@@ -33,19 +31,19 @@ class Page extends ApplicationComponent
 
         if($this->contentCache != null)
         {
-            echo $this->contentCache;
+           echo $this->contentCache;
         }
         else
         {
             require $this->contentFile;
-
         }
 
         $content = ob_get_clean();
 
         ob_start();
-        require __DIR__ . '/../../App/' . $this->app->name() . '/Templates/layout.php';
+        require __DIR__.'/../../App/'.$this->app->name().'/Templates/layout.php';
         return ob_get_clean();
+
     }
 
     public function contentFile()

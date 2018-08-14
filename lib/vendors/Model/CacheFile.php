@@ -1,7 +1,5 @@
 <?php
-
 namespace Model;
-
 /**
  * Class CacheFile
  * @package Model
@@ -10,25 +8,27 @@ namespace Model;
  */
 class CacheFile
 {
-
-
     private $_timeUp = array(
         'views' => 3600 * 24 * 3,
         'data' => 3600 * 24 * 10, // for all models
         'index' => 3600 * 24 * 10
     );
 
+    private $_errorLogs = '../tmp/cache/errorLogs.xml';
+
     private $_folders = array(
         'data' => '../tmp/cache/data',
-        'views' => '../tmp/cache/views'
+        'views' => '../tmp/cache/views',
     );
 
     const ENTITY_NEWS = 'news';
     const ENTITY_COMMENT = 'comment';
     const LIST_CACHE = 'list';
-
+    const VIEW_CACHE = 'view';
 
     private $_data = null;
+    private $_view = null;
+
     private $dir_cacheConfig = '../App/Backend/Config/app.xml';
 
     /**
@@ -37,13 +37,9 @@ class CacheFile
      */
     public function isActivated()
     {
-
-
         $xml = new \DOMDocument;
         $xml->load($this->dir_cacheConfig);
-
         $elements = $xml->getElementsByTagName('define');
-
         foreach ($elements as $element) {
             if ($element->getAttribute('var') == 'activeCache' && $element->getAttribute('value') === '1') {
                 return true;
@@ -52,17 +48,15 @@ class CacheFile
         return false;
     }
 
-
     /**
-     * Méthode permettant de récupérer les datas mises en cache.
+     * Méthode permettant d'obtenir le timestamp du fichier $filename au moment de sa création.
      * @param $filename
      * @return mixed
      */
-    public function getCache($key)
+    public function getTimeStamp($type, $filename)
     {
-        $filename = $this->_getFilename($key);
         $this->_loadData($filename);
-        return ((isset($this->_data[1])) ? $this->_data[1] : null);
+        return ((isset($this->_data[0])) ? $this->_data[0] : false);
     }
 
     /**
@@ -70,11 +64,11 @@ class CacheFile
      * @param $filename
      * @return bool
      */
-    public function checkCacheValidy($key)
+    public function checkCacheValidy($type, $key)
     {
-        $filename = $this->_getFilename($key);
+        $filename = $this->_getFilename($type, $key);
 
-        if (date(time()) <= $this->getTimeStamp($filename)) {
+        if (date(time()) <= $this->getTimeStamp($type, $filename)) {
             return true;
         } else {
             $this->deleteCache($filename);
@@ -82,25 +76,77 @@ class CacheFile
         }
     }
 
+    /**
+     * Get filename by Cache Key
+     * @param $key
+     * @param $type
+     * @return string
+     */
+    private function _getFilename( $type, $key)
+    {
+        $keyParts = explode("-", $key);
+        switch ($keyParts[0]) {
+            case self::ENTITY_NEWS :
+            case self::ENTITY_COMMENT :
+            case self::LIST_CACHE :
+            case self::VIEW_CACHE :
+                return $this->_folders[$type] . "/" . $key . ".txt";
+                break;
+            default:
+                return $key;
+                break;
+        }
+    }
+
+    /**
+     * Méthode permettant de mettre en cache les data $dataPDO à l'emplacement $filename.
+     * @param $content
+     * @param $type
+     * @param $key
+     */
+    public function createCache($content, $type, $key)
+    {
+        if ($type === "views") {
+
+            $data = array(date(time()) + $this->_timeUp[$type], file_get_contents($content));
+            $filename = $this->_getFilename($type, $key); //Not change View cache for moment
+
+        } else {
+
+            $data = array(date(time()) + $this->_timeUp[$type], $content);
+            $filename = $this->_getFilename($type, $key);
+
+        }
+
+        if (file_put_contents($filename, serialize($data)) === false) {
+            $this->errorLogs($filename);
+            exit;
+        }
+    }
+
     private function _loadData($filename)
     {
-        if (!$this->_data) {
-            if (file_exists($filename)) {
+
+        if (!$this->_data && !$this->_view)
+        {
+            if (file_exists($filename))
+            {
                 $this->_data = unserialize(file_get_contents($filename));
+                $this->_view = unserialize(file_get_contents($filename));
             }
         }
     }
 
     /**
-     * Méthode permettant d'obtenir le timestamp du fichier $filename au moment de sa création.
+     * Méthode permettant de récupérer les data mises en cache.
      * @param $filename
      * @return mixed
      */
-    public function getTimeStamp($filename)
+    public function getCache($type, $key)
     {
+        $filename = $this->_getFilename($type, $key);
         $this->_loadData($filename);
-        return ((isset($this->_data[0])) ? $this->_data[0] : false);
-
+        return ((isset($this->_data[1])) ? $this->_data[1] : null);
     }
 
     /**
@@ -119,15 +165,15 @@ class CacheFile
      */
     public function deleteAllCache()
     {
-        $folders = $this->_folders;
-
-        //@FIXME review this, directory is hardcoded and the double foreach
-        foreach ($folders as $folder => $dir) {
+        foreach ($this->_folders as $dir)
+        {
             $dir_iterator = new \RecursiveDirectoryIterator($dir);
             $iterator = new \RecursiveIteratorIterator($dir_iterator);
 
-            foreach ($iterator as $dirName => $file) {
-                if ($dirName != "../tmp/cache/$folder\." && $dirName != "../tmp/cache/$folder\..") {
+            foreach($iterator as $file)
+            {
+                if($file != $dir.'\\.' && $file != $dir.'\\..' )
+                {
                     unlink($file);
                 }
             }
@@ -135,48 +181,22 @@ class CacheFile
     }
 
     /**
-     * Méthode permettant de mettre en cache les datas $dataPDO à l'emplacement $filename.
-     * @param $content
-     * @param $type
-     * @param $key
+     * Write error in cache's log
+     * @param $filename
      */
-    public function createCache($content, $type, $key)
+    public function errorLogs($filename)
     {
-        if ($type === "views") {
-            $data = array(date(time()) + $this->_timeUp[$type], file_get_contents($content));
-            $filename = $key; //Not change View cache for moment
-        } else {
-            $data = array(date(time()) + $this->_timeUp[$type], $content);
-            $filename = $this->_getFilename($key);
-        }
 
-        if (file_put_contents($filename, serialize($data)) === false) {
-            exit; //FIXME add logs into application to save errors
-        }
+        $xml = new \DOMDocument('1.0', 'utf-8');
+
+        $xml->appendChild($error = $xml->createElement('ERROR'));
+
+        $error->appendChild($xml->createElement('time', date('Y-m-d H:i:s')));
+        $error->appendChild($xml->createElement('filename', $filename));
+
+        $xmlContent = $xml->saveXML();
+
+        file_put_contents($this->_errorLogs,$xmlContent);
     }
-
-    /**
-     * Get filename by Cache Key
-     * @param $key
-     * @return string
-     */
-    private function _getFilename($key)
-    {
-        $keyParts = explode("-", $key);
-
-        switch ($keyParts[0]) {
-
-            case self::ENTITY_NEWS :
-            case self::ENTITY_COMMENT :
-            case self::LIST_CACHE :
-                return $this->_folders["data"] . "/" . $key . ".txt";
-                break;
-
-            default:
-                return $key;
-                break;
-        }
-    }
-
 
 }

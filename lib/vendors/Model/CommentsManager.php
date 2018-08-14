@@ -1,10 +1,7 @@
 <?php
-
 namespace Model;
-
 use \OCFram\Manager;
 use \Entity\Comment;
-
 abstract class CommentsManager extends Manager
 {
     /**
@@ -13,21 +10,18 @@ abstract class CommentsManager extends Manager
      * @return void
      */
     abstract protected function add(Comment $comment);
-
     /**
      * Méthode permettant de supprimer un commentaire.
      * @param $id L'identifiant du commentaire à supprimer
      * @return void
      */
     abstract public function delete($id);
-
     /**
      * Méthode permettant de supprimer tous les commentaires liés à une news
      * @param $news L'identifiant de la news dont les commentaires doivent être supprimés
      * @return void
      */
     abstract public function deleteFromNews($news);
-
     /**
      * Méthode permettant d'enregistrer un commentaire.
      * @param $comment Le commentaire à enregistrer
@@ -41,7 +35,6 @@ abstract class CommentsManager extends Manager
             throw new \RuntimeException('Le commentaire doit être validé pour être enregistré');
         }
     }
-
     /**
      * Méthode permettant de récupérer une liste de commentaires.
      * @param $news La news sur laquelle on veut récupérer les commentaires
@@ -52,32 +45,24 @@ abstract class CommentsManager extends Manager
         $commentsCache = new CacheFile;
         $cacheKey = sprintf("list-comment-%d", $news);
         $commentsListPDO = null;
-
-        if ($cache && $commentsCache->isActivated() == true && $commentsCache->checkCacheValidy($cacheKey) === true) {
-            $commentsListPDO = $commentsCache->getCache($cacheKey);
+        if ($cache && $commentsCache->isActivated() == true && $commentsCache->checkCacheValidy('data', $cacheKey) === true) {
+            $commentsListPDO = $commentsCache->getCache('data', $cacheKey);
         }
-
         if (!$commentsListPDO) {
             $commentsListPDO = $this->getListOfPDO($news);
-
             if ($commentsCache->isActivated() == true && count($commentsListPDO) > 0) {
                 $commentsCache->createCache($commentsListPDO, 'data', $cacheKey);
             }
-
         }
-
         return $commentsListPDO;
     }
-
     abstract public function getListOfPDO($news);
-
     /**
      * Méthode permettant de modifier un commentaire.
      * @param $comment Le commentaire à modifier
      * @return void
      */
     abstract protected function modify(Comment $comment);
-
     /**
      * Méthode permettant d'obtenir un commentaire spécifique.
      * @param $id L'identifiant du commentaire

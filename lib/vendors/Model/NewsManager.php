@@ -1,10 +1,7 @@
 <?php
-
 namespace Model;
-
 use \OCFram\Manager;
 use \Entity\News;
-
 abstract class NewsManager extends Manager
 {
     /**
@@ -13,7 +10,6 @@ abstract class NewsManager extends Manager
      * @return void
      */
     abstract protected function add(News $news);
-
     public function save(News $news)
     {
         if ($news->isValid()) {
@@ -22,20 +18,17 @@ abstract class NewsManager extends Manager
             throw new \RuntimeException('La news doit être validée pour être enregistrée');
         }
     }
-
     /**
      * Méthode renvoyant le nombre de news total.
      * @return int
      */
     abstract public function count();
-
     /**
      * Méthode permettant de supprimer une news.
      * @param $id int L'identifiant de la news à supprimer
      * @return void
      */
     abstract public function delete($id);
-
     /**
      * Méthode retournant une liste de news demandée.
      * @param $debut int La première news à sélectionner
@@ -50,28 +43,18 @@ abstract class NewsManager extends Manager
         $cacheKey = sprintf("list-news-%d-%d", $debut, $limite);
         $dataPDO = null;
 
-        if ($cache && $dataCache->isActivated() == true && $dataCache->checkCacheValidy($cacheKey) == true) {
-            $dataPDO = $dataCache->getCache($cacheKey);
+        if ($cache && $dataCache->isActivated() == true && $dataCache->checkCacheValidy('data', $cacheKey) == true) {
+            $dataPDO = $dataCache->getCache('data', $cacheKey);
         }
-
         if (!$dataPDO) {
-
             $dataPDO = $this->getListPDO($debut, $limite);
-
             if ($dataCache->isActivated() == true) {
-
                 $dataCache->createCache($dataPDO, "data", $cacheKey);
             }
-
-
         }
-
         return $dataPDO;
-
     }
-
     abstract public function getListPDO($debut = -1, $limite = -1);
-
     /**
      * Méthode retournant une news précise.
      * @param $id int L'identifiant de la news à récupérer
@@ -82,27 +65,18 @@ abstract class NewsManager extends Manager
         $dataCache = new CacheFile;
         $cacheKey = "news-" . $id;
         $dataPDO = null;
-
-        if ($cache && $dataCache->isActivated() == true && $dataCache->checkCacheValidy($cacheKey) === true) {
-            $dataPDO = $dataCache->getCache($cacheKey);
+        if ($cache && $dataCache->isActivated() == true && $dataCache->checkCacheValidy('data', $cacheKey) === true) {
+            $dataPDO = $dataCache->getCache('data', $cacheKey);
         }
-
         if (!$dataPDO) {
-
             $dataPDO = $this->getUniquePDO($id);
             if ($dataCache->isActivated() == true) {
                 $dataCache->createCache($dataPDO, 'data', $cacheKey);
             }
-
-
         }
-
         return $dataPDO;
-
     }
-
     abstract public function getUniquePDO($id);
-
     /**
      * Méthode permettant de modifier une news.
      * @param $news news la news à modifier
