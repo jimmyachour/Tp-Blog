@@ -67,10 +67,6 @@ abstract class BackController extends ApplicationComponent
             throw new \InvalidArgumentException('La vue doit être une chaine de caractères valide');
         }
 
-        $this->page->setContentFile($dir_view);
-
-        //View disabled for the moment
-/*
         $viewCache = new CacheFile;
 
         if ($viewCache->isActivated() && $viewCache->checkCacheValidy('views', $cacheKey) == true )
@@ -79,13 +75,9 @@ abstract class BackController extends ApplicationComponent
         }
         else
         {
+            $this->page->setCacheKey($cacheKey);
             $this->page->setContentFile($dir_view);
-
-            if ($viewCache->isActivated() == true)
-            {
-                $viewCache->createCache($dir_view,'views',$cacheKey);
-            }
         }
-*/
+
     }
 }

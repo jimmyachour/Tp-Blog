@@ -1,4 +1,5 @@
 <?php
+
 namespace Model;
 /**
  * Class CacheFile
@@ -82,7 +83,7 @@ class CacheFile
      * @param $type
      * @return string
      */
-    private function _getFilename( $type, $key)
+    private function _getFilename($type, $key)
     {
         $keyParts = explode("-", $key);
         switch ($keyParts[0]) {
@@ -108,7 +109,7 @@ class CacheFile
     {
         if ($type === "views") {
 
-            $data = array(date(time()) + $this->_timeUp[$type], file_get_contents($content));
+            $data = array(date(time()) + $this->_timeUp[$type], $content);
             $filename = $this->_getFilename($type, $key); //Not change View cache for moment
 
         } else {
@@ -127,10 +128,8 @@ class CacheFile
     private function _loadData($filename)
     {
 
-        if (!$this->_data && !$this->_view)
-        {
-            if (file_exists($filename))
-            {
+        if (!$this->_data && !$this->_view) {
+            if (file_exists($filename)) {
                 $this->_data = unserialize(file_get_contents($filename));
                 $this->_view = unserialize(file_get_contents($filename));
             }
@@ -165,15 +164,12 @@ class CacheFile
      */
     public function deleteAllCache()
     {
-        foreach ($this->_folders as $dir)
-        {
+        foreach ($this->_folders as $dir) {
             $dir_iterator = new \RecursiveDirectoryIterator($dir);
             $iterator = new \RecursiveIteratorIterator($dir_iterator);
 
-            foreach($iterator as $file)
-            {
-                if($file != $dir.'\\.' && $file != $dir.'\\..' )
-                {
+            foreach ($iterator as $file) {
+                if ($file != $dir . '\\.' && $file != $dir . '\\..') {
                     unlink($file);
                 }
             }
@@ -196,7 +192,7 @@ class CacheFile
 
         $xmlContent = $xml->saveXML();
 
-        file_put_contents($this->_errorLogs,$xmlContent);
+        file_put_contents($this->_errorLogs, $xmlContent);
     }
 
 }

@@ -1,0 +1,14 @@
+a:2:{i:0;i:1534857069;i:1;s:1099:"<p style="text-align: center">Il y a actuellement 3 news. En voici la liste :</p>
+
+<table>
+  <tr>
+      <th>Auteur</th>
+      <th>Titre</th>
+      <th>Date d'ajout</th>
+      <th>Dernière modification</th>
+      <th>Action</th>
+  </tr>
+<tr><td>Victor Hugo test</td><td>Lorem Ipsum</td><td>le 11/06/2018 à 22h13</td><td>le 24/06/2018 à 15h55</td><td><a href="news-update-8.html"><img src="/images/update.png" alt="Modifier" /></a> <a href="news-delete-8.html"><img src="/images/delete.png" alt="Supprimer" /></a></td></tr>
+<tr><td>Victor Hugo</td><td>Lorem Ipsum</td><td>le 11/06/2018 à 22h13</td><td>le 11/06/2018 à 22h14</td><td><a href="news-update-7.html"><img src="/images/update.png" alt="Modifier" /></a> <a href="news-delete-7.html"><img src="/images/delete.png" alt="Supprimer" /></a></td></tr>
+<tr><td>Victor Hugo</td><td>Lorem Ipsum</td><td>le 11/06/2018 à 22h13</td><td>le 11/06/2018 à 22h14</td><td><a href="news-update-6.html"><img src="/images/update.png" alt="Modifier" /></a> <a href="news-delete-6.html"><img src="/images/delete.png" alt="Supprimer" /></a></td></tr>
+</table>";}

@@ -1,0 +1,20 @@
+a:2:{i:0;i:1534855946;i:1;s:1425:"<p>Par <em>Victor Hugo test</em>, le 11/06/2018 à 22h13</p>
+<h2>Lorem Ipsum</h2>
+<p>Quanta autem vis amicitiae sit, ex hoc intellegi maxime potest, quod ex infinita societate generis humani, quam conciliavit ipsa natura, ita contracta res est et adducta in angustum ut omnis caritas aut inter duos aut inter paucos iungeretur.<br />
+<br />
+Inter quos Paulus eminebat notarius ortus in Hispania, glabro quidam sub vultu latens, odorandi vias periculorum occultas perquam sagax. is in Brittanniam missus ut militares quosdam perduceret ausos conspirasse Magnentio, cum reniti non possent, iussa licentius supergressus fluminis modo fortunis conplurium sese repentinus infudit et ferebatur per strages multiplices ac ruinas, vinculis membra ingenuorum adfligens et quosdam obterens manicis, crimina scilicet multa consarcinando a veritate longe discreta. unde admissum est facinus impium, quod Constanti tempus nota inusserat sempiterna.</p>
+
+  <p style="text-align: right;"><small><em>Modifiée le 24/06/2018 à 15h55</em></small></p>
+
+<p><a href="commenter-8.html">Ajouter un commentaire</a></p>
+
+<fieldset>
+  <legend>
+    Posté par <strong>jimmy</strong> le 19/06/2018 à 22h57     -
+      <a href="admin/comment-update-1.html">Modifier</a> |
+      <a href="admin/comment-delete-1.html">Supprimer</a>
+      </legend>
+  <p>pas mal cette news...</p>
+</fieldset>
+
+<p><a href="commenter-8.html">Ajouter un commentaire</a></p>";}

@@ -1,0 +1,7 @@
+a:2:{i:0;i:1534842964;i:1;s:780:"  <h2><a href="news-8.html">Lorem Ipsum</a></h2>
+  <p>Quanta autem vis amicitiae sit, ex hoc intellegi maxime potest, quod ex infinita societate generis humani, quam conciliavit ipsa natura, ita contracta res est et adducta in angustum ut omnis caritas...</p>
+  <h2><a href="news-7.html">Lorem Ipsum</a></h2>
+  <p>Quanta autem vis amicitiae sit, ex hoc intellegi maxime potest, quod ex infinita societate generis humani, quam conciliavit ipsa natura, ita contracta res est et adducta in angustum ut omnis caritas...</p>
+  <h2><a href="news-6.html">Lorem Ipsum</a></h2>
+  <p>Quanta autem vis amicitiae sit, ex hoc intellegi maxime potest, quod ex infinita societate generis humani, quam conciliavit ipsa natura, ita contracta res est et adducta in angustum ut omnis caritas...</p>
+";}

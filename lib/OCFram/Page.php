@@ -2,11 +2,14 @@
 
 namespace OCFram;
 
+use Model\CacheFile;
+
 class Page extends ApplicationComponent
 {
     protected $contentFile;
     protected $vars = [];
     protected $contentCache;
+    protected $cacheKey;
 
     public function addVar($var, $value)
     {
@@ -31,14 +34,23 @@ class Page extends ApplicationComponent
 
         if($this->contentCache != null)
         {
+
            echo $this->contentCache;
+           $content = ob_get_clean();
+
         }
         else
         {
             require $this->contentFile;
-        }
+            $content = ob_get_clean();
 
-        $content = ob_get_clean();
+            $viewCache = new CacheFile;
+
+            if ($viewCache->isActivated() == true)
+            {
+                $viewCache->createCache($content,'views',$this->cacheKey);
+            }
+        }
 
         ob_start();
         require __DIR__.'/../../App/'.$this->app->name().'/Templates/layout.php';
@@ -69,5 +81,16 @@ class Page extends ApplicationComponent
     public function setContentCache($cacheView)
     {
         $this->contentCache = $cacheView;
+    }
+
+    public function cacheKey()
+    {
+        return $this->cacheKey;
+    }
+
+    public function setCacheKey($cacheKey)
+    {
+
+        $this->cacheKey = $cacheKey;
     }
 }
